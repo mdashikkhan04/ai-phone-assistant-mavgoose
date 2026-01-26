@@ -1,0 +1,14 @@
+[
+    {
+        "store_id": "store_1",
+        "name": "FixIt Downtown",
+        "phone_number": "+1234567890",
+        "location": "New York, NY"
+    },
+    {
+        "store_id": "store_2",
+        "name": "QuickFix West",
+        "phone_number": "+1987654321",
+        "location": "Los Angeles, CA"
+    }
+]

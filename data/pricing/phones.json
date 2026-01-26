@@ -1,0 +1,10 @@
+{
+    "iPhone 13": {
+        "screen": 199,
+        "battery": 89
+    },
+    "iPhone 14": {
+        "screen": 229,
+        "battery": 99
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "PS5": {
+        "hdmi port": 150,
+        "cleaning": 80
+    },
+    "Switch": {
+        "screen": 120,
+        "joycon drift": 40
+    }
+}
