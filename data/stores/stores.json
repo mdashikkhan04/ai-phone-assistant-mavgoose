@@ -3,12 +3,14 @@
         "store_id": "store_1",
         "name": "FixIt Downtown",
         "phone_number": "+1234567890",
+        "transfer_number": "+15551112222",
         "location": "New York, NY"
     },
     {
         "store_id": "store_2",
         "name": "QuickFix West",
         "phone_number": "+1987654321",
+        "transfer_number": "+15553334444",
         "location": "Los Angeles, CA"
     }
 ]

@@ -1,0 +1,5 @@
+{
+    "store_1": "https://booking.store1.com",
+    "store_2": "https://booking.store2.com",
+    "default": "https://booking.ourshop.com"
+}

@@ -1,7 +1,11 @@
 from core.intent_classifier import classify_intent
 from business_logic.pricing_engine import get_repair_price
+from utils.time_utils import is_business_hours
+from core.store_resolver import STORES_FILE, DEFAULT_STORE
+from database.call_logs import log_call_event
 
-def start_fsm(transcript: str):
+
+def start_fsm(transcript: str, store_id: str = "default", call_sid: str = "unknown"):
     """
     Initial entry point for the Finite State Machine.
     """
@@ -12,60 +16,114 @@ def start_fsm(transcript: str):
     intent = classification['intent']
     is_computer = classification['is_computer_repair']
     
+    transcript_lower = transcript.lower()
     print(f"Detected Intent: {intent}")
     print(f"Is Computer Repair: {is_computer}")
+    
+    # Complex issue detection
+    complex_keywords = ["water damage", "motherboard", "data recovery"]
+    is_complex = any(word in transcript_lower for word in complex_keywords)
     
     pricing_info = None
     response_type = "unknown"
     response_payload = {}
 
-    if intent == "pricing":
-        if is_computer:
-            print("LOG: Pricing is RESTRICTED for computer/laptop repairs.")
-            response_type = "pricing_restricted"
-        else:
-            # VERY SIMPLE and SAFE heuristic for model/issue extraction
-            model = None
-            issue = None
-            category = "phone" # default
-            
-            transcript_lower = transcript.lower()
-            
-            # Model detection
-            if "iphone 13" in transcript_lower:
-                model = "iPhone 13"
-            elif "iphone 14" in transcript_lower:
-                model = "iPhone 14"
-            elif "ipad air 4" in transcript_lower:
-                model = "iPad Air 4"
-                category = "tablet"
-            elif "ps5" in transcript_lower:
-                model = "PS5"
-                category = "console"
-            
-            # Issue detection
-            if "screen" in transcript_lower:
-                issue = "screen"
-            elif "battery" in transcript_lower:
-                issue = "battery"
-            elif "hdmi" in transcript_lower:
-                issue = "hdmi port"
-                category = "console"
+    # Check business hours
+    open_now = is_business_hours()
 
-            # Call get_repair_price ONLY if all slots are found
+    # Model and Issue slots for briefing/pricing
+    model = None
+    issue = None
+    category = "phone" # default
+    
+    # Model detection
+    if "iphone 13" in transcript_lower:
+        model = "iPhone 13"
+    elif "iphone 14" in transcript_lower:
+        model = "iPhone 14"
+    elif "ipad air 4" in transcript_lower:
+        model = "iPad Air 4"
+        category = "tablet"
+    elif "ps5" in transcript_lower:
+        model = "PS5"
+        category = "console"
+    
+    # Issue detection
+    if "screen" in transcript_lower:
+        issue = "screen"
+    elif "battery" in transcript_lower:
+        issue = "battery"
+    elif "hdmi" in transcript_lower:
+        issue = "hdmi port"
+        category = "console"
+
+    # LOGIC BRANCHES
+    if is_computer:
+        print("LOG: Pricing is RESTRICTED for computer/laptop repairs.")
+        response_type = "pricing_restricted"
+    
+    # Case: Warm Transfer (Triggered by intent, complexity, or missing price during business hours)
+    elif open_now and (intent == "transfer" or is_complex):
+        response_type = "warm_transfer"
+    
+    elif intent == "pricing":
+        if not open_now:
+            print("LOG: After-hours pricing intent detected. Offering SMS booking.")
+            response_type = "offer_booking_sms"
+        else:
+            # Attempt to find a price
             if model and issue:
                 pricing_info = get_repair_price(category, model, issue)
                 
-                if pricing_info:
-                    print(f"LOG: Price found: {pricing_info['price']} {pricing_info['currency']} for {model} {issue}")
-                    response_type = "price_found"
-                    response_payload = {"price": pricing_info['price']}
-                else:
-                    print(f"LOG: No pricing found in database for {model} {issue}.")
-                    response_type = "price_not_found"
+            if pricing_info:
+                print(f"LOG: Price found: {pricing_info['price']} {pricing_info['currency']} for {model} {issue}")
+                response_type = "price_found"
+                response_payload = {"price": pricing_info['price']}
             else:
-                print(f"LOG: Pricing could not be determined. Missing slots: model={model}, issue={issue}")
-                response_type = "price_not_found"
+                # Pricing not found during business hours -> Warm Transfer
+                print(f"LOG: Pricing not determined during business hours. Triggering transfer.")
+                response_type = "warm_transfer"
+    
+    # If Warm Transfer was determined, build the payload
+    if response_type == "warm_transfer" and open_now:
+        # Resolve store metadata for transfer number
+        store_data = DEFAULT_STORE
+        if os.path.exists(STORES_FILE):
+            try:
+                with open(STORES_FILE, "r") as f:
+                    stores = json.load(f)
+                    matching_store = next((s for s in stores if s.get("store_id") == store_id), None)
+                    if matching_store:
+                        store_data = matching_store
+            except:
+                pass
+        
+        transfer_number = store_data.get("transfer_number", store_data.get("phone_number"))
+        
+        # Build briefing
+        device_desc = model if model else "a device"
+        issue_desc = issue if issue else "an unknown issue"
+        if is_complex:
+            detected_complex = next((w for w in complex_keywords if w in transcript_lower), "complex issue")
+            issue_desc = f"{detected_complex}"
+            
+        briefing = f"Transferring a customer inquiring about {device_desc} {issue_desc}."
+        
+        response_payload = {
+            "store_phone_number": transfer_number,
+            "briefing_text": briefing
+        }
+
+    # Log initial FSM event
+    log_call_event({
+        "call_sid": call_sid,
+        "store_id": store_id,
+        "intent": intent,
+        "response_type": response_type,
+        "pricing_found": pricing_info is not None,
+        "sms_sent": False, # Will be logged in webhook if triggered
+        "transfer_attempted": False # Will be logged in webhook if triggered
+    })
 
     return {
         "state": "pricing_check" if intent == "pricing" else "initial", 
@@ -74,6 +132,7 @@ def start_fsm(transcript: str):
         "is_computer_repair": is_computer,
         "pricing_info": pricing_info,
         "response_type": response_type,
-        "response_payload": response_payload
+        "response_payload": response_payload,
+        "store_id": store_id
     }
 

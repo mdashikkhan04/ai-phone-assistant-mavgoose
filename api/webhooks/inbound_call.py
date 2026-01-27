@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Response, Request
 from twilio.twiml.voice_response import VoiceResponse
 from core.store_resolver import resolve_store
+from core import prompt_manager
 
 router = APIRouter()
 
@@ -20,8 +21,8 @@ async def handle_inbound_call(request: Request):
 
     response = VoiceResponse()
     
-    # Dynamic greeting based on resolved store
-    greeting = f"Hello! Thank you for calling {store_name} in {store_location}. How can I help you today?"
+    # Dynamic greeting from prompt_manager
+    greeting = prompt_manager.get_greeting(store_name, store_location)
     
     # Gather speech from the caller
     response.say(
