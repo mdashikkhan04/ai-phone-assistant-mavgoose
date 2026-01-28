@@ -1,10 +1,179 @@
 {
-    "iPad Air 4": {
-        "screen": 249,
-        "battery": 109
+    "iPad 2": {
+        "glass": 89.99,
+        "lcd": 119.99,
+        "glass_lcd": 149.99,
+        "battery": 99.99,
+        "dock": 89.99
     },
-    "Galaxy Tab S8": {
-        "screen": 299,
-        "battery": 119
+    "iPad 3": {
+        "glass": 89.99,
+        "lcd": 119.99,
+        "glass_lcd": 149.99,
+        "battery": 99.99,
+        "dock": 89.99
+    },
+    "iPad 4": {
+        "glass": 89.99,
+        "lcd": 119.99,
+        "glass_lcd": 149.99,
+        "battery": 99.99,
+        "dock": 89.99
+    },
+    "iPad 5": {
+        "glass": 99.99,
+        "lcd": 149.99,
+        "glass_lcd": 169.99,
+        "battery": 129.99,
+        "dock": 164.99
+    },
+    "iPad 6": {
+        "glass": 119.99,
+        "lcd": 149.99,
+        "glass_lcd": 179.99,
+        "battery": 129.99,
+        "dock": 164.99
+    },
+    "iPad 7": {
+        "glass": 144.99,
+        "lcd": 159.99,
+        "glass_lcd": 219.99,
+        "battery": 147.99,
+        "dock": 164.99
+    },
+    "iPad 8": {
+        "glass": 144.99,
+        "lcd": 179.99,
+        "glass_lcd": 239.99,
+        "battery": 147.99,
+        "dock": 184.99
+    },
+    "iPad 9": {
+        "glass": 144.99,
+        "lcd": 189.99,
+        "glass_lcd": 239.99,
+        "battery": 147.99,
+        "dock": 184.99
+    },
+    "iPad 10": {
+        "glass": 144.99,
+        "lcd": 209.0,
+        "glass_lcd": 279.99,
+        "battery": 147.99,
+        "dock": 184.99
+    },
+    "iPad Mini 2": {
+        "glass": 89.99,
+        "lcd": 119.99,
+        "glass_lcd": 139.99,
+        "battery": 99.99,
+        "dock": 164.99
+    },
+    "iPad Mini 3": {
+        "glass": 89.99,
+        "lcd": 119.99,
+        "glass_lcd": 139.99,
+        "battery": 99.99,
+        "dock": 164.99
+    },
+    "iPad Mini 4": {
+        "glass_lcd": 169.99,
+        "battery": 149.99,
+        "dock": 164.99
+    },
+    "iPad Mini 5": {
+        "glass_lcd": 194.99,
+        "battery": 149.99,
+        "dock": 184.99
+    },
+    "iPad Mini 6": {
+        "glass_lcd": 425.0,
+        "battery": 249.99,
+        "dock": 249.99
+    },
+    "iPad Air": {
+        "glass": 99.99,
+        "lcd": 149.99,
+        "glass_lcd": 169.99,
+        "battery": 129.99,
+        "dock": 164.99
+    },
+    "iPad Air 2": {
+        "glass_lcd": 199.99,
+        "battery": 129.99,
+        "dock": 164.99
+    },
+    "iPad Air 3": {
+        "glass_lcd": 239.99,
+        "battery": 184.99,
+        "dock": 199.99
+    },
+    "iPad Air 4": {
+        "glass_lcd": 269.99,
+        "battery": 189.99,
+        "dock": 209.99
+    },
+    "iPad Air 5": {
+        "glass_lcd": 289.99,
+        "battery": 189.99,
+        "dock": 249.99
+    },
+    "iPad Pro 9.7\"": {
+        "glass_lcd": 197.99,
+        "battery": 157.99,
+        "dock": 179.99
+    },
+    "iPad Pro 10.5\"": {
+        "glass_lcd": 229.99,
+        "battery": 167.99,
+        "dock": 179.99
+    },
+    "iPad Pro 11 1st": {
+        "glass_lcd": 299.99,
+        "battery": 197.99,
+        "dock": 179.99
+    },
+    "iPad Pro 11 2nd": {
+        "glass_lcd": 299.99,
+        "battery": 197.99,
+        "dock": 179.99
+    },
+    "iPad Pro 11 3rd": {
+        "glass_lcd": 359.99,
+        "battery": 197.99,
+        "dock": 229.99
+    },
+    "iPad Pro 11 4th": {
+        "glass_lcd": 359.99,
+        "battery": 197.99,
+        "dock": 229.99
+    },
+    "iPad Pro 12.9 1st": {
+        "glass_lcd": 359.99,
+        "battery": 249.99,
+        "dock": 249.99
+    },
+    "iPad Pro 12.9 2nd": {
+        "glass_lcd": 529.99
+    },
+    "iPad Pro 12.9 3rd": {
+        "glass_lcd": 339.99,
+        "battery": 249.99,
+        "dock": 229.99
+    },
+    "iPad Pro 12.9 4th": {
+        "glass_lcd": 359.99,
+        "battery": 249.99,
+        "dock": 229.99
+    },
+    "iPad Pro 12.9 5th": {
+        "glass_lcd": 494.99,
+        "battery": 289.99,
+        "dock": 259.99
+    },
+    "iPad Pro 12.9 6th": {
+        "glass_lcd": 494.99,
+        "battery": 299.99,
+        "dock": 299.99
     }
 }

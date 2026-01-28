@@ -1,8 +1,11 @@
+import json
+import os
 from core.intent_classifier import classify_intent
 from business_logic.pricing_engine import get_repair_price
 from utils.time_utils import is_business_hours
 from core.store_resolver import STORES_FILE, DEFAULT_STORE
 from database.call_logs import log_call_event
+from core import prompt_manager
 
 
 def start_fsm(transcript: str, store_id: str = "default", call_sid: str = "unknown"):
@@ -100,18 +103,27 @@ def start_fsm(transcript: str, store_id: str = "default", call_sid: str = "unkno
         
         transfer_number = store_data.get("transfer_number", store_data.get("phone_number"))
         
-        # Build briefing
-        device_desc = model if model else "a device"
-        issue_desc = issue if issue else "an unknown issue"
-        if is_complex:
-            detected_complex = next((w for w in complex_keywords if w in transcript_lower), "complex issue")
-            issue_desc = f"{detected_complex}"
+        # Build structured fields for tech briefing
+        device_desc = model if model else "their device"
+        issue_desc = issue if issue else "a repair issue"
+        
+        # Determine transfer reason context exactly as requested
+        if intent == "transfer":
+            transfer_reason = "their specific request to speak with someone"
+        elif is_complex:
+            transfer_reason = "the complexity of the repair"
+        else:
+            transfer_reason = "the exact pricing and turnaround details"
             
-        briefing = f"Transferring a customer inquiring about {device_desc} {issue_desc}."
+        # Format briefing text using prompt_manager
+        briefing = prompt_manager.get_tech_briefing(device_desc, issue_desc, transfer_reason)
         
         response_payload = {
             "store_phone_number": transfer_number,
-            "briefing_text": briefing
+            "briefing_text": briefing,
+            "device": device_desc,
+            "issue": issue_desc,
+            "transfer_reason": transfer_reason
         }
 
     # Log initial FSM event

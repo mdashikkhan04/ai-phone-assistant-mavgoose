@@ -12,9 +12,18 @@ CATEGORY_MAP = {
     "console": "consoles.json"
 }
 
+# SOP: Map common speech terms to normalized database keys
+ISSUE_MAP = {
+    "screen": ["glass_lcd", "glass", "lcd"],
+    "battery": ["battery"],
+    "charging": ["dock"],
+    "port": ["dock"],
+    "hdmi": ["hdmi", "dock"]
+}
+
 def get_repair_price(device_category: str, model: str, issue: str) -> dict | None:
     """
-    Look up building repair prices from static JSON files using EXACT matching.
+    Look up repair prices from static JSON files using exact and mapped matching.
     """
     filename = CATEGORY_MAP.get(device_category.lower())
     if not filename:
@@ -37,13 +46,19 @@ def get_repair_price(device_category: str, model: str, issue: str) -> dict | Non
         
         if stored_model:
             model_data = pricing_data[stored_model]
-            # Exact issue matching (case-insensitive)
+            issue_lower = issue.lower()
+            
+            # 1. Try direct matching
             for issue_name, price in model_data.items():
-                if issue_name.lower() == issue.lower():
-                    return {
-                        "price": price,
-                        "currency": "USD"
-                    }
+                if issue_name.lower() == issue_lower:
+                    return {"price": price, "currency": "USD"}
+            
+            # 2. Try mapped matching (e.g. "screen" -> "glass_lcd")
+            target_keys = ISSUE_MAP.get(issue_lower, [])
+            for target in target_keys:
+                if target in model_data:
+                    return {"price": model_data[target], "currency": "USD"}
+
     except Exception as e:
         print(f"Error reading pricing data: {e}")
     

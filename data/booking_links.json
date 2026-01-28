@@ -1,5 +1,9 @@
 {
-    "store_1": "https://booking.store1.com",
-    "store_2": "https://booking.store2.com",
+    "newport_news": "https://booking.newportnews.com",
+    "lynnhaven": "https://booking.lynnhaven.com",
+    "glen_allen": "https://booking.glenallen.com",
+    "midlothian": "https://booking.midlothian.com",
+    "lexington": "https://booking.lexington.com",
+    "colonial_heights": "https://booking.colonialheights.com",
     "default": "https://booking.ourshop.com"
 }

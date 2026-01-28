@@ -1,16 +1,50 @@
 [
     {
-        "store_id": "store_1",
-        "name": "FixIt Downtown",
-        "phone_number": "+1234567890",
-        "transfer_number": "+15551112222",
-        "location": "New York, NY"
+        "store_id": "newport_news",
+        "name": "Newport News",
+        "phone_number": "+17576371217",
+        "transfer_number": "+17576371217",
+        "location": "Newport News, Virginia",
+        "address": "12551 Jefferson Ave #259, Newport News, VA 23602"
     },
     {
-        "store_id": "store_2",
-        "name": "QuickFix West",
-        "phone_number": "+1987654321",
-        "transfer_number": "+15553334444",
-        "location": "Los Angeles, CA"
+        "store_id": "lynnhaven",
+        "name": "Lynnhaven",
+        "phone_number": "+17577994705",
+        "transfer_number": "+17577994705",
+        "location": "Virginia Beach, Virginia",
+        "address": "664 Phoenix Dr #140, Virginia Beach, VA 23452"
+    },
+    {
+        "store_id": "glen_allen",
+        "name": "Glen Allen",
+        "phone_number": "+18042075724",
+        "transfer_number": "+18042075724",
+        "location": "Glen Allen, Virginia",
+        "address": "1090 Virginia Center Pkwy #107, Glen Allen, VA 23059"
+    },
+    {
+        "store_id": "midlothian",
+        "name": "Midlothian",
+        "phone_number": "+18049449058",
+        "transfer_number": "+18049449058",
+        "location": "North Chesterfield, Virginia",
+        "address": "11545 Busy St, North Chesterfield, VA 23236"
+    },
+    {
+        "store_id": "lexington",
+        "name": "Lexington",
+        "phone_number": "+18036368828",
+        "transfer_number": "+18036368828",
+        "location": "Lexington, South Carolina",
+        "address": "5594 Sunset Blvd C, Lexington, SC 29072"
+    },
+    {
+        "store_id": "colonial_heights",
+        "name": "Colonial Heights",
+        "phone_number": "+18047351149",
+        "transfer_number": "+18047351149",
+        "location": "Colonial Heights, Virginia",
+        "address": "1052 Temple Ave, Colonial Heights, VA 23834"
     }
 ]

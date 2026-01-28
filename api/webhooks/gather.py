@@ -96,8 +96,16 @@ async def handle_gather(request: Request):
         response.say(msg, voice="alice", language="en-US")
     
     elif response_type == "warm_transfer":
-        msg = prompt_manager.get_transfer_message()
-        response.say(msg, voice="alice", language="en-US")
+        # Multi-part Customer-Facing Script (Part 1 & 3) using prompt_manager
+        # 1. Reassurance & Justification
+        response.say(prompt_manager.get_transfer_justification(), voice="alice", language="en-US")
+        response.pause(length=1)
+        
+        # 2. Assurance (Passing context)
+        response.say(prompt_manager.get_transfer_context_assurance(), voice="alice", language="en-US")
+        
+        # 3. Instruction to stay on the line
+        response.say(prompt_manager.get_transfer_instruction(), voice="alice", language="en-US")
         
         # Execute transfer
         store_phone = payload.get("store_phone_number")
@@ -113,6 +121,9 @@ async def handle_gather(request: Request):
             "response_type": "warm_transfer_initiated",
             "transfer_attempted": True
         })
+
+        # Smoothing message right before execution
+        response.say(prompt_manager.get_transfer_connecting(), voice="alice", language="en-US")
 
         success = initiate_warm_transfer(call_sid, store_phone, briefing)
         
