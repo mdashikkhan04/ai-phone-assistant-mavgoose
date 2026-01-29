@@ -8,11 +8,12 @@ from database.call_logs import log_call_event
 from core import prompt_manager
 
 
-def start_fsm(transcript: str, store_id: str = "default", call_sid: str = "unknown"):
+def start_fsm(transcript: str, store: dict, call_sid: str = "unknown"):
     """
     Initial entry point for the Finite State Machine.
     """
-    print(f"FSM Started with transcript: {transcript}")
+    store_id = store.get("store_id", "default")
+    print(f"FSM Started for {store.get('name')} with transcript: {transcript}")
     
     # Classify intent
     classification = classify_intent(transcript)
@@ -89,19 +90,7 @@ def start_fsm(transcript: str, store_id: str = "default", call_sid: str = "unkno
     
     # If Warm Transfer was determined, build the payload
     if response_type == "warm_transfer" and open_now:
-        # Resolve store metadata for transfer number
-        store_data = DEFAULT_STORE
-        if os.path.exists(STORES_FILE):
-            try:
-                with open(STORES_FILE, "r") as f:
-                    stores = json.load(f)
-                    matching_store = next((s for s in stores if s.get("store_id") == store_id), None)
-                    if matching_store:
-                        store_data = matching_store
-            except:
-                pass
-        
-        transfer_number = store_data.get("transfer_number", store_data.get("phone_number"))
+        transfer_number = store.get("transfer_number", store.get("did"))
         
         # Build structured fields for tech briefing
         device_desc = model if model else "their device"
@@ -145,6 +134,5 @@ def start_fsm(transcript: str, store_id: str = "default", call_sid: str = "unkno
         "pricing_info": pricing_info,
         "response_type": response_type,
         "response_payload": response_payload,
-        "store_id": store_id
+        "store": store
     }
-

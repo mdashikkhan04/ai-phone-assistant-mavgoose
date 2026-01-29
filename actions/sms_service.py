@@ -1,19 +1,18 @@
-import os
-from twilio.rest import Client
+from typing import Dict, Any
+from utils.twilio_utils import get_twilio_client, get_twilio_credentials
+from loguru import logger
 
-def send_booking_sms(to_number: str, booking_url: str):
+def send_booking_sms(to_number: str, booking_url: str, store: Dict[str, Any]):
     """
-    Sends a booking link to the customer via Twilio SMS.
+    Sends a booking link to the customer via store-specific Twilio SMS.
     """
-    account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
-    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
-    from_number = os.environ.get("TWILIO_FROM_NUMBER")
+    client = get_twilio_client(store)
+    creds = get_twilio_credentials(store)
+    from_number = creds.get("from_number")
 
-    if not all([account_sid, auth_token, from_number]):
-        print("ERROR: Twilio credentials missing from environment.")
+    if not client or not from_number:
+        logger.error(f"Cannot send SMS: Twilio credentials missing for {store.get('name')}")
         return
-
-    client = Client(account_sid, auth_token)
 
     message_body = f"You can book your appointment here: {booking_url}"
 
@@ -23,6 +22,6 @@ def send_booking_sms(to_number: str, booking_url: str):
             from_=from_number,
             to=to_number
         )
-        print(f"SMS Sent successfully: {message.sid}")
+        logger.success(f"SMS Sent successfully for {store.get('name')}: {message.sid}")
     except Exception as e:
-        print(f"Failed to send SMS: {e}")
+        logger.error(f"Failed to send SMS for {store.get('name')}: {e}")

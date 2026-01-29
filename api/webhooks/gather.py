@@ -5,15 +5,13 @@ from fastapi import APIRouter, Request, Response
 from twilio.twiml.voice_response import VoiceResponse
 from core.state_machine import start_fsm
 from actions.sms_service import send_booking_sms
-from core.store_resolver import resolve_store
+from core.store_resolver import resolve_store_by_did
 from actions.transfer_service import initiate_warm_transfer
 from database.call_logs import log_call_event
 from core import prompt_manager
+from loguru import logger
 
 router = APIRouter()
-
-BASE_DIR = Path(__file__).resolve().parents[2]
-BOOKING_LINKS_FILE = BASE_DIR / "data" / "booking_links.json"
 
 @router.post("/gather")
 async def handle_gather(request: Request):
@@ -41,7 +39,7 @@ async def handle_gather(request: Request):
     is_consent = any(word in transcript_lower for word in YES_WORDS)
 
     # Resolve store for context
-    store = resolve_store(called_number)
+    store = resolve_store_by_did(called_number)
     store_id = store.get("store_id", "default")
 
     if is_consent:
@@ -54,16 +52,12 @@ async def handle_gather(request: Request):
             "sms_sent": False
         })
 
-        # Load booking links
-        booking_url = None
-        if os.path.exists(BOOKING_LINKS_FILE):
-            with open(BOOKING_LINKS_FILE, "r") as f:
-                links = json.load(f)
-                booking_url = links.get(store_id)
+        # Load booking link from store object
+        booking_url = store.get("booking_link")
         
         if booking_url:
-            # Send SMS
-            send_booking_sms(from_number, booking_url)
+            # Send SMS with store context
+            send_booking_sms(from_number, booking_url, store)
 
             # Log SMS sent
             log_call_event({
@@ -78,15 +72,18 @@ async def handle_gather(request: Request):
             response.say(prompt_manager.get_sms_sent_confirmation(), voice="alice", language="en-US")
             return Response(content=str(response), media_type="application/xml")
         else:
-            print(f"WARNING: No booking URL found for store_id: {store_id}. SMS NOT SENT.")
+            logger.warning(f"No booking URL found for store: {store.get('name')}. SMS NOT SENT.")
 
-    print(f"Captured Transcript: {transcript}")
+    logger.info(f"Captured Transcript: {transcript}")
 
-    # Pass to FSM and get result (include store_id and call_sid)
-    fsm_result = start_fsm(transcript, store_id, call_sid)
+    # Pass to FSM and get result (include full store object and call_sid)
+    fsm_result = start_fsm(transcript, store, call_sid)
     response_type = fsm_result.get("response_type")
     payload = fsm_result.get("response_payload", {})
     intent = fsm_result.get("intent")
+    
+    # Store object from FSM result
+    current_store = fsm_result.get("store", store)
 
     response = VoiceResponse()
 
@@ -111,7 +108,7 @@ async def handle_gather(request: Request):
         store_phone = payload.get("store_phone_number")
         briefing = payload.get("briefing_text")
         
-        print(f"LOG: Initiating transfer to {store_phone}")
+        logger.info(f"Initiating transfer to {store_phone} for store {current_store.get('name')}")
         
         # Log transfer attempt
         log_call_event({
@@ -125,10 +122,10 @@ async def handle_gather(request: Request):
         # Smoothing message right before execution
         response.say(prompt_manager.get_transfer_connecting(), voice="alice", language="en-US")
 
-        success = initiate_warm_transfer(call_sid, store_phone, briefing)
+        success = initiate_warm_transfer(call_sid, store_phone, briefing, current_store)
         
         if not success:
-            print("LOG: Transfer failed. Offering booking link fallback.")
+            logger.warning(f"Transfer failed for {current_store.get('name')}. Offering booking link fallback.")
             response.say(prompt_manager.get_transfer_failed(), voice="alice", language="en-US")
             response.gather(input="speech", action="/webhooks/gather", method="POST", speech_timeout="3")
     

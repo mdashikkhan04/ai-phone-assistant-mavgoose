@@ -2,49 +2,67 @@
     {
         "store_id": "newport_news",
         "name": "Newport News",
-        "phone_number": "+17576371217",
-        "transfer_number": "+17576371217",
+        "did": "+447307277495",
+        "sms_number": "+447307277495",
+        "transfer_number": "01758792678",
         "location": "Newport News, Virginia",
-        "address": "12551 Jefferson Ave #259, Newport News, VA 23602"
+        "address": "12551 Jefferson Ave #259, Newport News, VA 23602",
+        "booking_link": "https://booking.newportnews.com",
+        "env_prefix": "NEWPORT_NEWS"
     },
     {
         "store_id": "lynnhaven",
         "name": "Lynnhaven",
-        "phone_number": "+17577994705",
-        "transfer_number": "+17577994705",
+        "did": "+17577994705",
+        "sms_number": "+17577994705",
+        "transfer_number": "(757) 837-0990",
         "location": "Virginia Beach, Virginia",
-        "address": "664 Phoenix Dr #140, Virginia Beach, VA 23452"
+        "address": "664 Phoenix Dr #140, Virginia Beach, VA 23452",
+        "booking_link": "https://booking.lynnhaven.com",
+        "env_prefix": "LYNNHAVEN"
     },
     {
         "store_id": "glen_allen",
         "name": "Glen Allen",
-        "phone_number": "+18042075724",
-        "transfer_number": "+18042075724",
+        "did": "+18042075724",
+        "sms_number": "+18042075724",
+        "transfer_number": "(804) 709-1960",
         "location": "Glen Allen, Virginia",
-        "address": "1090 Virginia Center Pkwy #107, Glen Allen, VA 23059"
+        "address": "1090 Virginia Center Pkwy #107, Glen Allen, VA 23059",
+        "booking_link": "https://booking.glenallen.com",
+        "env_prefix": "GLEN_ALLEN"
     },
     {
         "store_id": "midlothian",
         "name": "Midlothian",
-        "phone_number": "+18049449058",
-        "transfer_number": "+18049449058",
+        "did": "+18049449058",
+        "sms_number": "+18049449058",
+        "transfer_number": "(804) 293-4143",
         "location": "North Chesterfield, Virginia",
-        "address": "11545 Busy St, North Chesterfield, VA 23236"
+        "address": "11545 Busy St, North Chesterfield, VA 23236",
+        "booking_link": "https://booking.midlothian.com",
+        "env_prefix": "MIDLOTHIAN"
     },
     {
         "store_id": "lexington",
         "name": "Lexington",
-        "phone_number": "+18036368828",
-        "transfer_number": "+18036368828",
+        "did": "+18036368828",
+        "sms_number": "+18036368828",
+        "transfer_number": "(803) 520-8285",
         "location": "Lexington, South Carolina",
-        "address": "5594 Sunset Blvd C, Lexington, SC 29072"
+        "address": "5594 Sunset Blvd C, Lexington, SC 29072",
+        "booking_link": "https://booking.lexington.com",
+        "env_prefix": "LEXINGTON"
     },
     {
         "store_id": "colonial_heights",
         "name": "Colonial Heights",
-        "phone_number": "+18047351149",
-        "transfer_number": "+18047351149",
+        "did": "+18047351149",
+        "sms_number": "+18047351149",
+        "transfer_number": "(804) 805-8646",
         "location": "Colonial Heights, Virginia",
-        "address": "1052 Temple Ave, Colonial Heights, VA 23834"
+        "address": "1052 Temple Ave, Colonial Heights, VA 23834",
+        "booking_link": "https://booking.colonialheights.com",
+        "env_prefix": "COLONIAL_HEIGHTS"
     }
 ]

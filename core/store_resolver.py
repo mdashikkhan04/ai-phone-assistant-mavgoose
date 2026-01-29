@@ -9,11 +9,11 @@ STORES_FILE = BASE_DIR / "data" / "stores" / "stores.json"
 DEFAULT_STORE = {
     "store_id": "default",
     "name": "our store",
-    "phone_number": "default",
+    "did": "default",
     "location": "your local area"
 }
 
-def resolve_store(called_number: str) -> dict:
+def resolve_store_by_did(called_number: str) -> dict:
     """
     Look up a store based on the incoming phone number (DID).
     """
@@ -25,10 +25,9 @@ def resolve_store(called_number: str) -> dict:
             stores = json.load(f)
         
         for store in stores:
-            if store.get("phone_number") == called_number:
+            if store.get("did") == called_number:
                 return store
     except Exception as e:
-        # For now, fail silently but future logging can be added
         return DEFAULT_STORE
 
     return DEFAULT_STORE
