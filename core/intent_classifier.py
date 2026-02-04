@@ -9,7 +9,7 @@ def classify_intent(transcript: str) -> dict:
     # Rule-based intent detection
     intent = "unknown"
     
-    pricing_keywords = ["price", "cost", "how much", "screen", "battery", "repair"]
+    pricing_keywords = ["price", "cost", "how much", "screen", "battery", "repair", "fix", "broken", "cracked", "not working"]
     booking_keywords = ["appointment", "book", "schedule", "come in", "visit"]
     transfer_keywords = ["talk to", "representative", "manager", "technician", "person", "human"]
     

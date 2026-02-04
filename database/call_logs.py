@@ -1,51 +1,44 @@
-import json
-import os
 from datetime import datetime
-from pathlib import Path
-
-# Path for the logs file
-BASE_DIR = Path(__file__).resolve().parents[1]
-LOGS_DIR = BASE_DIR / "data" / "logs"
-LOGS_FILE = LOGS_DIR / "call_events.json"
-
-# Ensure data/logs directory exists
-LOGS_DIR.mkdir(parents=True, exist_ok=True)
+from utils.backend_client import backend_client
+from loguru import logger
 
 def log_call_event(data: dict):
     """
-    Logs a call event to a JSON file.
+    Logs a call event to the Django backend.
     Expected data fields:
     - call_sid
-    - store_id
+    - store_id (int)
     - intent
     - response_type
     - pricing_found (bool)
     - sms_sent (bool)
     - transfer_attempted (bool)
     """
+    # Map AI part fields to Backend part expected fields
+    # Backend CallSession model has fields like:
+    # call_type, started_at, ended_at, phone_number, store, duration, etc.
+    
+    # For now, we'll send the raw data and let the backend handler deal with it,
+    # or map it specifically here if we know the backend schema.
+    
     event = {
         "call_sid": data.get("call_sid"),
-        "store_id": data.get("store_id"),
+        "store": data.get("store_id"),  # Backend expects store ID
+        "call_type": data.get("response_type"),
         "intent": data.get("intent"),
-        "response_type": data.get("response_type"),
-        "pricing_found": data.get("pricing_found", False),
-        "sms_sent": data.get("sms_sent", False),
-        "transfer_attempted": data.get("transfer_attempted", False),
-        "created_at": datetime.utcnow().isoformat()
+        "metadata": {
+            "pricing_found": data.get("pricing_found", False),
+            "sms_sent": data.get("sms_sent", False),
+            "transfer_attempted": data.get("transfer_attempted", False)
+        }
     }
 
-    print(f"DEBUG LOG: {json.dumps(event, indent=2)}")
-
-    # Persistence to JSON file
-    logs = []
-    if LOGS_FILE.exists():
-        try:
-            with open(LOGS_FILE, "r") as f:
-                logs = json.load(f)
-        except:
-            logs = []
+    logger.info(f"Logging call event to backend: {event}")
     
-    logs.append(event)
+    # Post to backend
+    result = backend_client.log_call_event(event)
     
-    with open(LOGS_FILE, "w") as f:
-        json.dump(logs, f, indent=4)
+    if not result:
+        logger.error(f"Failed to log call event for {data.get('call_sid')} to backend.")
+    else:
+        logger.success(f"Call event logged successfully to backend.")

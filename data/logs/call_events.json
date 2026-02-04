@@ -1,0 +1,52 @@
+[
+    {
+        "call_sid": "CAa6e3e71ae91171006d9dd03e04cd3948",
+        "store_id": "colonial_heights",
+        "intent": "unknown",
+        "response_type": "unknown",
+        "pricing_found": false,
+        "sms_sent": false,
+        "transfer_attempted": false,
+        "created_at": "2026-01-30T15:31:15.893631"
+    },
+    {
+        "call_sid": "CA41c9ace6c056a4e3bf7ccd7b46d8be36",
+        "store_id": "colonial_heights",
+        "intent": "unknown",
+        "response_type": "unknown",
+        "pricing_found": false,
+        "sms_sent": false,
+        "transfer_attempted": false,
+        "created_at": "2026-01-30T15:32:57.216132"
+    },
+    {
+        "call_sid": "CAc3bee461d337b1c16c554bdd917309d9",
+        "store_id": "newport_news",
+        "intent": "unknown",
+        "response_type": "unknown",
+        "pricing_found": false,
+        "sms_sent": false,
+        "transfer_attempted": false,
+        "created_at": "2026-01-30T15:34:32.620711"
+    },
+    {
+        "call_sid": "CA7496b1e64c060a43441032d1167c4c58",
+        "store_id": "lynnhaven",
+        "intent": "pricing",
+        "response_type": "warm_transfer",
+        "pricing_found": false,
+        "sms_sent": false,
+        "transfer_attempted": false,
+        "created_at": "2026-01-30T15:38:38.064402"
+    },
+    {
+        "call_sid": "CA7496b1e64c060a43441032d1167c4c58",
+        "store_id": "lynnhaven",
+        "intent": "pricing",
+        "response_type": "warm_transfer_initiated",
+        "pricing_found": false,
+        "sms_sent": false,
+        "transfer_attempted": true,
+        "created_at": "2026-01-30T15:38:38.066461"
+    }
+]

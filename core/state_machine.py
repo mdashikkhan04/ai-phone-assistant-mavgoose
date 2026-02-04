@@ -3,7 +3,7 @@ import os
 from core.intent_classifier import classify_intent
 from business_logic.pricing_engine import get_repair_price
 from utils.time_utils import is_business_hours
-from core.store_resolver import STORES_FILE, DEFAULT_STORE
+from core.store_resolver import DEFAULT_STORE
 from database.call_logs import log_call_event
 from core import prompt_manager
 
@@ -12,7 +12,7 @@ def start_fsm(transcript: str, store: dict, call_sid: str = "unknown"):
     """
     Initial entry point for the Finite State Machine.
     """
-    store_id = store.get("store_id", "default")
+    store_id = store.get("id")  # Backend integer ID
     print(f"FSM Started for {store.get('name')} with transcript: {transcript}")
     
     # Classify intent
@@ -31,8 +31,9 @@ def start_fsm(transcript: str, store: dict, call_sid: str = "unknown"):
     pricing_info = None
     response_type = "unknown"
     response_payload = {}
-
+    
     # Check business hours
+    # Note: Simplified business hours check. Could be expanded to use backend config.
     open_now = is_business_hours()
 
     # Model and Issue slots for briefing/pricing
@@ -77,7 +78,8 @@ def start_fsm(transcript: str, store: dict, call_sid: str = "unknown"):
         else:
             # Attempt to find a price
             if model and issue:
-                pricing_info = get_repair_price(category, model, issue)
+                # Updated signature: (store_id, category, model, issue)
+                pricing_info = get_repair_price(store_id, category, model, issue)
                 
             if pricing_info:
                 print(f"LOG: Price found: {pricing_info['price']} {pricing_info['currency']} for {model} {issue}")
@@ -90,7 +92,8 @@ def start_fsm(transcript: str, store: dict, call_sid: str = "unknown"):
     
     # If Warm Transfer was determined, build the payload
     if response_type == "warm_transfer" and open_now:
-        transfer_number = store.get("transfer_number", store.get("did"))
+        # Backend Store uses 'transfer_number' or 'did'
+        transfer_number = store.get("transfer_number") or store.get("did")
         
         # Build structured fields for tech briefing
         device_desc = model if model else "their device"

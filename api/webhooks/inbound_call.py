@@ -16,16 +16,21 @@ async def handle_inbound_call(request: Request):
     
     # Resolve store
     store = resolve_store_by_did(called_number)
+    store_id = store.get("id")
     
     # Dynamic greeting from prompt_manager
-    greeting = prompt_manager.get_greeting(store.get("name"), store.get("location"))
+    greeting = prompt_manager.get_greeting(
+        store.get("name"), 
+        store.get("location"), 
+        store_id=store_id
+    )
     
     response = VoiceResponse()
     
     # Gather speech from the caller
     response.say(
     greeting,
-    voice="alice",
+    voice="Polly.Joanna",
     language="en-US"
     )
 

@@ -28,7 +28,7 @@ async def handle_gather(request: Request):
         response = VoiceResponse()
         response.say(
             prompt_manager.get_repeat_prompt(),
-            voice="alice",
+            voice="Polly.Joanna",
             language="en-US"
         )
         return Response(content=str(response), media_type="application/xml")
@@ -40,7 +40,7 @@ async def handle_gather(request: Request):
 
     # Resolve store for context
     store = resolve_store_by_did(called_number)
-    store_id = store.get("store_id", "default")
+    store_id = store.get("id")
 
     if is_consent:
         # Log consent event
@@ -69,7 +69,7 @@ async def handle_gather(request: Request):
             })
 
             response = VoiceResponse()
-            response.say(prompt_manager.get_sms_sent_confirmation(), voice="alice", language="en-US")
+            response.say(prompt_manager.get_sms_sent_confirmation(), voice="Polly.Joanna", language="en-US")
             return Response(content=str(response), media_type="application/xml")
         else:
             logger.warning(f"No booking URL found for store: {store.get('name')}. SMS NOT SENT.")
@@ -90,19 +90,19 @@ async def handle_gather(request: Request):
     if response_type == "price_found":
         price = payload.get("price")
         msg = prompt_manager.get_pricing_found(price)
-        response.say(msg, voice="alice", language="en-US")
+        response.say(msg, voice="Polly.Joanna", language="en-US")
     
     elif response_type == "warm_transfer":
         # Multi-part Customer-Facing Script (Part 1 & 3) using prompt_manager
         # 1. Reassurance & Justification
-        response.say(prompt_manager.get_transfer_justification(), voice="alice", language="en-US")
+        response.say(prompt_manager.get_transfer_justification(), voice="Polly.Joanna", language="en-US")
         response.pause(length=1)
         
         # 2. Assurance (Passing context)
-        response.say(prompt_manager.get_transfer_context_assurance(), voice="alice", language="en-US")
+        response.say(prompt_manager.get_transfer_context_assurance(), voice="Polly.Joanna", language="en-US")
         
         # 3. Instruction to stay on the line
-        response.say(prompt_manager.get_transfer_instruction(), voice="alice", language="en-US")
+        response.say(prompt_manager.get_transfer_instruction(), voice="Polly.Joanna", language="en-US")
         
         # Execute transfer
         store_phone = payload.get("store_phone_number")
@@ -120,31 +120,32 @@ async def handle_gather(request: Request):
         })
 
         # Smoothing message right before execution
-        response.say(prompt_manager.get_transfer_connecting(), voice="alice", language="en-US")
+        response.say(prompt_manager.get_transfer_connecting(), voice="Polly.Joanna", language="en-US")
 
         success = initiate_warm_transfer(call_sid, store_phone, briefing, current_store)
         
         if not success:
             logger.warning(f"Transfer failed for {current_store.get('name')}. Offering booking link fallback.")
-            response.say(prompt_manager.get_transfer_failed(), voice="alice", language="en-US")
+            response.say(prompt_manager.get_transfer_failed(), voice="Polly.Joanna", language="en-US")
             response.gather(input="speech", action="/webhooks/gather", method="POST", speech_timeout="3")
     
     elif response_type == "offer_booking_sms":
         msg = prompt_manager.get_booking_offer()
-        response.say(msg, voice="alice", language="en-US")
+        response.say(msg, voice="Polly.Joanna", language="en-US")
         # Listen for the "Yes"
         response.gather(input="speech", action="/webhooks/gather", method="POST", speech_timeout="3")
     
     elif response_type == "price_not_found":
         msg = prompt_manager.get_pricing_not_found()
-        response.say(msg, voice="alice", language="en-US")
+        response.say(msg, voice="Polly.Joanna", language="en-US")
     
     elif response_type == "pricing_restricted":
         msg = prompt_manager.get_pricing_restricted()
-        response.say(msg, voice="alice", language="en-US")
+        response.say(msg, voice="Polly.Joanna", language="en-US")
     
     else:
-        response.say(prompt_manager.get_fallback_message(), voice="alice", language="en-US")
+        response.say(prompt_manager.get_clarification_prompt(), voice="Polly.Joanna", language="en-US")
+        response.gather(input="speech", action="/webhooks/gather", method="POST", speech_timeout="3")
     
     # Keep the call alive
     response.pause(length=1) 

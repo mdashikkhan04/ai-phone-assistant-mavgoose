@@ -1,8 +1,29 @@
-def get_greeting(store_name: str, store_location: str) -> str:
-    """SOP: Engaging & Enthusiastic Greeting."""
-    # Note: store_name might already be 'uBreakiFix' or include it. 
-    # The requirement says 'Thank you for calling uBreakiFix!'
-    return f"Thank you for calling uBreakiFix in {store_location}! This is the AI assistant, what can I fix for you today?"
+from utils.backend_client import backend_client
+from loguru import logger
+
+# Cache for AI behavior configs to minimize backend calls per session
+_behavior_cache = {}
+
+def get_store_behavior(store_id: int):
+    """Fetch and cache AI behavior for a store."""
+    if store_id in _behavior_cache:
+        return _behavior_cache[store_id]
+    
+    config = backend_client.get_ai_behavior(store_id)
+    if config:
+        _behavior_cache[store_id] = config
+    return config
+
+def get_greeting(store_name: str, store_location: str, store_id: int = None) -> str:
+    """SOP: Engaging & Enthusiastic Greeting. Optionally dynamic from backend."""
+    if store_id:
+        config = get_store_behavior(store_id)
+        if config and config.get("greetings"):
+            # Check if store is open (simplified business hours logic could go here)
+            # For now, return the opening greeting if available
+            return config["greetings"].get("opening_hours_greeting") or f"Thank you for calling You Break I Fix in {store_location}! This is Alex from You Break I Fix, what can I fix for you today?"
+
+    return f"Thank you for calling You Break I Fix in {store_location}! This is Alex from You Break I Fix, what can I fix for you today?"
 
 def get_pricing_found(price: float) -> str:
     """SOP: Pricing builds trust but encourages in-store visits."""
@@ -18,6 +39,13 @@ def get_pricing_not_found() -> str:
         "I see this issue all the time—we’ll take great care of you. "
         "I don't have an exact price estimate for that repair right now, but I want to make sure you get the most accurate answer. "
         "Could you please tell me the device model or the specific issue again?"
+    )
+
+def get_clarification_prompt() -> str:
+    """SOP: Friendly fallback for unknown inputs."""
+    return (
+        "I can definitely help with that. "
+        "Could you tell me which device you’re having trouble with?"
     )
 
 def get_pricing_restricted() -> str:
@@ -60,7 +88,11 @@ def get_transfer_failed() -> str:
 def get_sms_sent_confirmation() -> str:
     return "I've sent the booking link to your phone. Is there anything else I can help with?"
 
-def get_fallback_message() -> str:
+def get_fallback_message(store_id: int = None) -> str:
+    if store_id:
+        config = get_store_behavior(store_id)
+        if config and config.get("fallback_response"):
+            return config["fallback_response"]
     return "Thanks, one moment please while I look into that for you."
 
 def get_repeat_prompt() -> str:

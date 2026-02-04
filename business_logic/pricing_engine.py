@@ -1,65 +1,51 @@
-import json
-import os
-from pathlib import Path
-
-# Paths
-BASE_DIR = Path(__file__).resolve().parents[1]
-PRICING_DIR = BASE_DIR / "data" / "pricing"
-
-CATEGORY_MAP = {
-    "phone": "phones.json",
-    "tablet": "tablets.json",
-    "console": "consoles.json"
-}
+from utils.backend_client import backend_client
+from loguru import logger
 
 # SOP: Map common speech terms to normalized database keys
+# This map helps bridge the gap between AI's detected issue and backend's repair_type name
 ISSUE_MAP = {
-    "screen": ["glass_lcd", "glass", "lcd"],
-    "battery": ["battery"],
-    "charging": ["dock"],
-    "port": ["dock"],
-    "hdmi": ["hdmi", "dock"]
+    "screen": ["glass_lcd", "glass", "lcd", "screen repair", "screen replacement"],
+    "battery": ["battery", "battery replacement"],
+    "charging": ["dock", "charging port"],
+    "port": ["dock", "charging port"],
+    "hdmi": ["hdmi", "hdmi port"]
 }
 
-def get_repair_price(device_category: str, model: str, issue: str) -> dict | None:
+def get_repair_price(store_id: int, device_category: str, model: str, issue: str) -> dict | None:
     """
-    Look up repair prices from static JSON files using exact and mapped matching.
+    Look up repair prices from the backend for a specific store.
     """
-    filename = CATEGORY_MAP.get(device_category.lower())
-    if not filename:
-        return None
-    
-    file_path = PRICING_DIR / filename
-    if not os.path.exists(file_path):
-        return None
-
     try:
-        with open(file_path, "r") as f:
-            pricing_data = json.load(f)
+        # Fetch prices for this store from the backend
+        prices = backend_client.get_price_list(store_id)
+        if not prices:
+            return None
+
+        issue_lower = issue.lower()
+        model_lower = model.lower()
         
-        # Exact model matching (case-insensitive)
-        stored_model = None
-        for key in pricing_data.keys():
-            if key.lower() == model.lower():
-                stored_model = key
-                break
+        # Filter logic
+        # Prices from backend usually have fields like:
+        # { "device_model_name": "iPhone 13", "repair_type_name": "Screen Replacement", "price": "129.99" }
         
-        if stored_model:
-            model_data = pricing_data[stored_model]
-            issue_lower = issue.lower()
+        possible_repairs = ISSUE_MAP.get(issue_lower, [issue_lower])
+        
+        for item in prices:
+            item_model = str(item.get("device_model_name", "")).lower()
+            item_repair = str(item.get("repair_type_name", "")).lower()
             
-            # 1. Try direct matching
-            for issue_name, price in model_data.items():
-                if issue_name.lower() == issue_lower:
-                    return {"price": price, "currency": "USD"}
-            
-            # 2. Try mapped matching (e.g. "screen" -> "glass_lcd")
-            target_keys = ISSUE_MAP.get(issue_lower, [])
-            for target in target_keys:
-                if target in model_data:
-                    return {"price": model_data[target], "currency": "USD"}
+            # Simple fuzzy/exact matching for model and repair type
+            if model_lower in item_model or item_model in model_lower:
+                # Check if repair type matches
+                if any(rep in item_repair for rep in possible_repairs):
+                    return {
+                        "price": float(item.get("price", 0)),
+                        "currency": "USD",
+                        "repair_type": item.get("repair_type_name"),
+                        "model": item.get("device_model_name")
+                    }
 
     except Exception as e:
-        print(f"Error reading pricing data: {e}")
+        logger.error(f"Error resolving dynamic price: {e}")
     
     return None
